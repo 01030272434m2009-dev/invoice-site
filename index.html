@@ -8,39 +8,40 @@
 <style>
 body {
     font-family: "Tahoma", sans-serif;
-    background: #eef2f7;
+    background: #f0f4f8;
     padding: 20px;
     direction: rtl;
 }
 
 .card {
     background: #ffffff;
-    padding: 30px 25px;
+    padding: 35px 30px;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12);
     max-width: 950px;
     margin: auto;
-    border-top: 5px solid #2196F3;
+    border-top: 6px solid #2196F3;
 }
 
 h2 {
     text-align: center;
     color: #2196F3;
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-bottom: 25px;
+    font-size: 26px;
 }
 
 .pharmacy {
     text-align: center;
     border-bottom: 2px dashed #ccc;
-    padding-bottom: 15px;
-    margin-bottom: 25px;
+    padding-bottom: 18px;
+    margin-bottom: 30px;
 }
 
 .pharmacy h3 {
     margin: 5px 0;
     color: #34495e;
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .info {
@@ -49,20 +50,34 @@ h2 {
     color: #555;
 }
 
+.customer-info {
+    background: #e3f2fd;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    color: #1e3a8a;
+}
+
+.customer-info span {
+    display: inline-block;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    box-sizing: border-box;
     table-layout: fixed;
 }
 
 th, td {
     border: 1px solid #ddd;
-    padding: 12px;
+    padding: 14px;
     text-align: center;
     font-size: 16px;
-    box-sizing: border-box;
     word-wrap: break-word;
 }
 
@@ -79,17 +94,17 @@ tbody tr:hover {
 }
 
 .total {
-    font-size: 22px;
+    font-size: 24px;
     color: #2ecc71;
-    margin-top: 20px;
+    margin-top: 25px;
     font-weight: bold;
     text-align: center;
 }
 
 .thanks {
     text-align: center;
-    margin-top: 25px;
-    font-size: 18px;
+    margin-top: 30px;
+    font-size: 19px;
     color: #34495e;
     font-style: italic;
 }
@@ -97,7 +112,7 @@ tbody tr:hover {
 .error {
     text-align: center;
     color: red;
-    font-size: 20px;
+    font-size: 22px;
     margin-top: 50px;
 }
 </style>
@@ -117,8 +132,11 @@ tbody tr:hover {
 
 <h2>🧾 تفاصيل الفاتورة</h2>
 
-<p id="customer" class="info"></p>
-<p id="phone" class="info"></p>
+<div class="customer-info">
+    <span>👤 العميل: <span id="customer"></span></span>
+    <span>📞 الهاتف: <span id="phone"></span></span>
+</div>
+
 <p id="payment" class="info"></p>
 <p id="date" class="info"></p>
 
@@ -181,7 +199,7 @@ if(!encoded){
         document.getElementById("phone").innerText = invoice.phone;
         document.getElementById("payment").innerText = invoice.payment;
         document.getElementById("date").innerText = invoice.date;
-        document.getElementById("total").innerText = invoice.total;
+        document.getElementById("total").innerText = "الإجمالي: " + invoice.total;
 
         // عرض الأصناف
         let rows = "";
@@ -203,5 +221,4 @@ if(!encoded){
 }
 </script>
 </body>
-</html>
 </html>
