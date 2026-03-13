@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar">
+
 <head>
+
 <meta charset="UTF-8">
+
 <title>تفاصيل الفاتورة</title>
 
 <style>
@@ -18,6 +21,10 @@ background:white;
 padding:20px;
 border-radius:10px;
 box-shadow:0 0 10px #ccc
+}
+
+h2{
+text-align:center
 }
 
 table{
@@ -40,10 +47,12 @@ color:white
 .total{
 font-size:20px;
 color:green;
-margin-top:20px
+margin-top:20px;
+font-weight:bold
 }
 
 </style>
+
 </head>
 
 <body>
@@ -54,75 +63,91 @@ margin-top:20px
 
 <p id="customer"></p>
 <p id="phone"></p>
-<p id="date"></p>
 <p id="payment"></p>
+<p id="date"></p>
 
 <table>
+
 <thead>
+
 <tr>
-<th>كود</th>
-<th>اسم الصنف</th>
+
+<th>الكود</th>
+<th>الصنف</th>
 <th>الكمية</th>
 <th>السعر</th>
 <th>الإجمالي</th>
+
 </tr>
+
 </thead>
 
 <tbody id="items"></tbody>
 
 </table>
 
-<div class="total" id="total"></div>
+<div id="total" class="total"></div>
 
 </div>
 
 
 <script>
 
-function getQueryParam(name)
+function getParam(name)
 {
 let url=new URL(window.location.href);
 return url.searchParams.get(name);
 }
 
-let data=getQueryParam("data");
+let encoded=getParam("data");
 
-if(data)
+if(encoded)
 {
 
-let json=atob(data);
+try{
+
+let json=atob(decodeURIComponent(encoded));
 
 let invoice=JSON.parse(json);
 
 document.getElementById("customer").innerText=invoice.customer;
 document.getElementById("phone").innerText=invoice.phone;
-document.getElementById("date").innerText=invoice.date;
 document.getElementById("payment").innerText=invoice.payment;
+document.getElementById("date").innerText=invoice.date;
 document.getElementById("total").innerText=invoice.total;
 
-let itemsHTML="";
+let rows="";
 
 invoice.items.forEach(i=>{
 
-itemsHTML+=`
+rows+=`
 
 <tr>
+
 <td>${i.code}</td>
 <td>${i.name}</td>
 <td>${i.qty}</td>
 <td>${i.price}</td>
 <td>${i.total}</td>
+
 </tr>
 
 `;
 
 });
 
-document.getElementById("items").innerHTML=itemsHTML;
+document.getElementById("items").innerHTML=rows;
+
+}catch(e){
+
+document.body.innerHTML="حدث خطأ في قراءة الفاتورة";
+
+}
 
 }
 
 </script>
 
 </body>
+
 </html>
