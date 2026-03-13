@@ -20,11 +20,18 @@ direction:rtl
 background:white;
 padding:20px;
 border-radius:10px;
-box-shadow:0 0 10px #ccc
+box-shadow:0 0 10px #ccc;
+max-width:900px;
+margin:auto
 }
 
 h2{
 text-align:center
+}
+
+.info{
+margin:5px 0;
+font-size:16px
 }
 
 table{
@@ -45,10 +52,17 @@ color:white
 }
 
 .total{
-font-size:20px;
+font-size:22px;
 color:green;
 margin-top:20px;
-font-weight:bold
+font-weight:bold;
+text-align:center
+}
+
+.error{
+text-align:center;
+color:red;
+font-size:20px
 }
 
 </style>
@@ -61,10 +75,10 @@ font-weight:bold
 
 <h2>🧾 تفاصيل الفاتورة</h2>
 
-<p id="customer"></p>
-<p id="phone"></p>
-<p id="payment"></p>
-<p id="date"></p>
+<p id="customer" class="info"></p>
+<p id="phone" class="info"></p>
+<p id="payment" class="info"></p>
+<p id="date" class="info"></p>
 
 <table>
 
@@ -93,22 +107,41 @@ font-weight:bold
 
 <script>
 
-function getParam(name)
-{
-let url=new URL(window.location.href);
-return url.searchParams.get(name);
+function getParam(name){
+    let url=new URL(window.location.href);
+    return url.searchParams.get(name);
+}
+
+// فك Base64 مع دعم العربية
+function decodeBase64UTF8(base64){
+
+    let binary=atob(base64);
+
+    let bytes=new Uint8Array(binary.length);
+
+    for(let i=0;i<binary.length;i++){
+        bytes[i]=binary.charCodeAt(i);
+    }
+
+    return new TextDecoder().decode(bytes);
 }
 
 let encoded=getParam("data");
 
-if(encoded)
-{
+if(!encoded){
+    document.body.innerHTML="<div class='error'>❌ لا توجد بيانات فاتورة</div>";
+}
+else{
 
 try{
 
-let json=atob(decodeURIComponent(encoded));
+let decoded=decodeURIComponent(encoded);
+
+let json=decodeBase64UTF8(decoded);
 
 let invoice=JSON.parse(json);
+
+// عرض البيانات
 
 document.getElementById("customer").innerText=invoice.customer;
 document.getElementById("phone").innerText=invoice.phone;
@@ -116,31 +149,30 @@ document.getElementById("payment").innerText=invoice.payment;
 document.getElementById("date").innerText=invoice.date;
 document.getElementById("total").innerText=invoice.total;
 
+// عرض الأصناف
+
 let rows="";
 
 invoice.items.forEach(i=>{
 
 rows+=`
-
 <tr>
-
 <td>${i.code}</td>
 <td>${i.name}</td>
 <td>${i.qty}</td>
 <td>${i.price}</td>
 <td>${i.total}</td>
-
 </tr>
-
 `;
 
 });
 
 document.getElementById("items").innerHTML=rows;
 
-}catch(e){
+}
+catch(e){
 
-document.body.innerHTML="حدث خطأ في قراءة الفاتورة";
+document.body.innerHTML="<div class='error'>❌ حدث خطأ في قراءة الفاتورة</div>";
 
 }
 
@@ -149,5 +181,7 @@ document.body.innerHTML="حدث خطأ في قراءة الفاتورة";
 </script>
 
 </body>
+
+</html>
 
 </html>
