@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="ar">
 
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>تفاصيل الفاتورة</title>
 
@@ -27,6 +29,18 @@ margin:auto
 
 h2{
 text-align:center
+}
+
+.pharmacy{
+text-align:center;
+border-bottom:2px dashed #ddd;
+padding-bottom:15px;
+margin-bottom:20px
+}
+
+.pharmacy h3{
+margin:5px 0;
+color:#2c3e50
 }
 
 .info{
@@ -59,6 +73,13 @@ font-weight:bold;
 text-align:center
 }
 
+.thanks{
+text-align:center;
+margin-top:25px;
+font-size:18px;
+color:#444
+}
+
 .error{
 text-align:center;
 color:red;
@@ -73,6 +94,17 @@ font-size:20px
 
 <div class="card">
 
+<div class="pharmacy">
+
+<h3 id="pharmacyName"></h3>
+<p id="pharmacyAddress"></p>
+<p id="pharmacyPhone"></p>
+<p id="pharmacyCR"></p>
+<p id="pharmacyTax"></p>
+<p id="pharmacyWelcome"></p>
+
+</div>
+
 <h2>🧾 تفاصيل الفاتورة</h2>
 
 <p id="customer" class="info"></p>
@@ -83,17 +115,13 @@ font-size:20px
 <table>
 
 <thead>
-
 <tr>
-
 <th>الكود</th>
 <th>الصنف</th>
 <th>الكمية</th>
 <th>السعر</th>
 <th>الإجمالي</th>
-
 </tr>
-
 </thead>
 
 <tbody id="items"></tbody>
@@ -102,36 +130,38 @@ font-size:20px
 
 <div id="total" class="total"></div>
 
-</div>
+<div id="thanks" class="thanks"></div>
 
+</div>
 
 <script>
 
 function getParam(name){
-    let url=new URL(window.location.href);
-    return url.searchParams.get(name);
+let url=new URL(window.location.href);
+return url.searchParams.get(name);
 }
 
 // فك Base64 مع دعم العربية
 function decodeBase64UTF8(base64){
 
-    let binary=atob(base64);
+let binary=atob(base64);
 
-    let bytes=new Uint8Array(binary.length);
+let bytes=new Uint8Array(binary.length);
 
-    for(let i=0;i<binary.length;i++){
-        bytes[i]=binary.charCodeAt(i);
-    }
+for(let i=0;i<binary.length;i++){
+bytes[i]=binary.charCodeAt(i);
+}
 
-    return new TextDecoder().decode(bytes);
+return new TextDecoder().decode(bytes);
 }
 
 let encoded=getParam("data");
 
 if(!encoded){
-    document.body.innerHTML="<div class='error'>❌ لا توجد بيانات فاتورة</div>";
-}
-else{
+
+document.body.innerHTML="<div class='error'>❌ لا توجد بيانات فاتورة</div>";
+
+}else{
 
 try{
 
@@ -141,7 +171,21 @@ let json=decodeBase64UTF8(decoded);
 
 let invoice=JSON.parse(json);
 
-// عرض البيانات
+// بيانات الصيدلية
+
+if(invoice.pharmacy){
+
+document.getElementById("pharmacyName").innerText=invoice.pharmacy.name;
+document.getElementById("pharmacyAddress").innerText="العنوان: "+invoice.pharmacy.address;
+document.getElementById("pharmacyPhone").innerText="📞 "+invoice.pharmacy.phone;
+document.getElementById("pharmacyCR").innerText="سجل تجاري: "+invoice.pharmacy.cr;
+document.getElementById("pharmacyTax").innerText="بطاقة ضريبية: "+invoice.pharmacy.tax;
+document.getElementById("pharmacyWelcome").innerText=invoice.pharmacy.welcome;
+document.getElementById("thanks").innerText=invoice.pharmacy.thanks;
+
+}
+
+// بيانات الفاتورة
 
 document.getElementById("customer").innerText=invoice.customer;
 document.getElementById("phone").innerText=invoice.phone;
@@ -169,8 +213,7 @@ rows+=`
 
 document.getElementById("items").innerHTML=rows;
 
-}
-catch(e){
+}catch(e){
 
 document.body.innerHTML="<div class='error'>❌ حدث خطأ في قراءة الفاتورة</div>";
 
@@ -183,5 +226,6 @@ document.body.innerHTML="<div class='error'>❌ حدث خطأ في قراءة ا
 </body>
 
 </html>
+
 
 </html>
