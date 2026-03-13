@@ -8,7 +8,7 @@
 <style>
 body {
     font-family: "Tahoma", sans-serif;
-    background: #f0f4f8;
+    background: #f7f9fc;
     padding: 20px;
     direction: rtl;
 }
@@ -17,30 +17,30 @@ body {
     background: #ffffff;
     padding: 35px 30px;
     border-radius: 15px;
-    box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
     max-width: 950px;
     margin: auto;
-    border-top: 6px solid #2196F3;
+    border-top: 5px solid #2196F3;
 }
 
 h2 {
     text-align: center;
     color: #2196F3;
     margin-bottom: 25px;
-    font-size: 26px;
+    font-size: 24px;
 }
 
 .pharmacy {
     text-align: center;
     border-bottom: 2px dashed #ccc;
     padding-bottom: 18px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .pharmacy h3 {
     margin: 5px 0;
     color: #34495e;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
 }
 
@@ -50,20 +50,17 @@ h2 {
     color: #555;
 }
 
+/* تحسين اسم العميل ورقم الهاتف */
 .customer-info {
-    background: #e3f2fd;
+    background: #e8f0fe;
     border-radius: 10px;
-    padding: 15px;
+    padding: 12px 15px;
     margin: 15px 0;
     display: flex;
     justify-content: space-between;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: bold;
-    color: #1e3a8a;
-}
-
-.customer-info span {
-    display: inline-block;
+    color: #1a237e;
 }
 
 table {
@@ -75,7 +72,7 @@ table {
 
 th, td {
     border: 1px solid #ddd;
-    padding: 14px;
+    padding: 12px;
     text-align: center;
     font-size: 16px;
     word-wrap: break-word;
@@ -94,17 +91,17 @@ tbody tr:hover {
 }
 
 .total {
-    font-size: 24px;
+    font-size: 22px;
     color: #2ecc71;
-    margin-top: 25px;
+    margin-top: 20px;
     font-weight: bold;
     text-align: center;
 }
 
 .thanks {
     text-align: center;
-    margin-top: 30px;
-    font-size: 19px;
+    margin-top: 25px;
+    font-size: 18px;
     color: #34495e;
     font-style: italic;
 }
@@ -112,7 +109,7 @@ tbody tr:hover {
 .error {
     text-align: center;
     color: red;
-    font-size: 22px;
+    font-size: 20px;
     margin-top: 50px;
 }
 </style>
@@ -199,7 +196,7 @@ if(!encoded){
         document.getElementById("phone").innerText = invoice.phone;
         document.getElementById("payment").innerText = invoice.payment;
         document.getElementById("date").innerText = invoice.date;
-        document.getElementById("total").innerText = "الإجمالي: " + invoice.total;
+        document.getElementById("total").innerText = invoice.total;
 
         // عرض الأصناف
         let rows = "";
