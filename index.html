@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ar">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -54,15 +53,17 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+    table-layout: fixed;
 }
 
-th,
-td {
+th, td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 12px;
     text-align: center;
     font-size: 16px;
+    box-sizing: border-box;
+    word-wrap: break-word;
 }
 
 th {
@@ -202,4 +203,5 @@ if(!encoded){
 }
 </script>
 </body>
+</html>
 </html>
