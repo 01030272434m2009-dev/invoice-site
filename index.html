@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>تفاصيل الفاتورة</title>
+<title>تفاصيل الفاتورة الإلكترونية</title>
 
 <style>
 body {
@@ -44,8 +44,14 @@ h2 {
     font-weight: bold;
 }
 
+.pharmacy p {
+    margin: 4px 0;
+    color: #666;
+    font-size: 15px;
+}
+
 .info {
-    margin: 6px 0;
+    margin: 8px 0;
     font-size: 17px;
     color: #555;
 }
@@ -106,6 +112,14 @@ tbody tr:hover {
     font-style: italic;
 }
 
+.loading {
+    text-align: center;
+    font-size: 22px;
+    color: #2196F3;
+    margin-top: 100px;
+    font-weight: bold;
+}
+
 .error {
     text-align: center;
     color: red;
@@ -116,105 +130,102 @@ tbody tr:hover {
 </head>
 
 <body>
-<div class="card">
-
-<div class="pharmacy">
-<h3 id="pharmacyName"></h3>
-<p id="pharmacyAddress"></p>
-<p id="pharmacyPhone"></p>
-<p id="pharmacyCR"></p>
-<p id="pharmacyTax"></p>
-<p id="pharmacyWelcome"></p>
-</div>
-
-<h2>🧾 تفاصيل الفاتورة</h2>
-
-<div class="customer-info">
-    <span>👤 العميل: <span id="customer"></span></span>
-    <span>📞 الهاتف: <span id="phone"></span></span>
-</div>
-
-<p id="payment" class="info"></p>
-<p id="date" class="info"></p>
-
-<table>
-<thead>
-<tr>
-<th>الكود</th>
-<th>الصنف</th>
-<th>الكمية</th>
-<th>السعر</th>
-<th>الإجمالي</th>
-</tr>
-</thead>
-<tbody id="items"></tbody>
-</table>
-
-<div id="total" class="total"></div>
-<div id="thanks" class="thanks"></div>
+<div id="mainContainer">
+    <div class="loading" id="loader">⏳ جاري تحميل بيانات الفاتورة السحابية من السيرفر...</div>
 </div>
 
 <script>
+// دالة لجلب البارامترات من الرابط
 function getParam(name){
     let url = new URL(window.location.href);
     return url.searchParams.get(name);
 }
 
-// فك Base64 مع دعم العربية
-function decodeBase64UTF8(base64){
-    let binary = atob(base64);
-    let bytes = new Uint8Array(binary.length);
-    for(let i=0;i<binary.length;i++){
-        bytes[i] = binary.charCodeAt(i);
-    }
-    return new TextDecoder().decode(bytes);
-}
+// رابط السيرفر السحابي الحالي (نفس الرابط المستضيف لبيانات جوجل شيت)
+const apiBaseUrl = "https://script.google.com/macros/s/AKfycbx4ezTTarc4aVuQ1VR6dxQTMRGgJaaJ1OPGPxCiRGMYzPB3MKikKA7HuJ_vjzxkOu6h3Q/exec";
 
-let encoded = getParam("data");
+let invoiceId = getParam("invoiceId");
 
-if(!encoded){
-    document.body.innerHTML = "<div class='error'>❌ لا توجد بيانات فاتورة</div>";
-}else{
-    try{
-        let decoded = decodeURIComponent(encoded);
-        let json = decodeBase64UTF8(decoded);
-        let invoice = JSON.parse(json);
-
-        // بيانات الصيدلية
-        if(invoice.pharmacy){
-            document.getElementById("pharmacyName").innerText = invoice.pharmacy.name;
-            document.getElementById("pharmacyAddress").innerText = "العنوان: " + invoice.pharmacy.address;
-            document.getElementById("pharmacyPhone").innerText = "📞 " + invoice.pharmacy.phone;
-            document.getElementById("pharmacyCR").innerText = "سجل تجاري: " + invoice.pharmacy.cr;
-            document.getElementById("pharmacyTax").innerText = "بطاقة ضريبية: " + invoice.pharmacy.tax;
-            document.getElementById("pharmacyWelcome").innerText = invoice.pharmacy.welcome;
-            document.getElementById("thanks").innerText = invoice.pharmacy.thanks;
+if(!invoiceId){
+    document.getElementById("mainContainer").innerHTML = "<div class='error'>❌ خطأ: لم يتم تحديد رقم فاتورة صحيح في الرابط.</div>";
+} else {
+    // الاتصال بالسيرفر الحالي لجلب الفاتورة المطلوبة بناءً على الـ ID
+    fetch(`${apiBaseUrl}?invoiceId=${invoiceId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("فشل الاتصال بالخادم السحابي");
+        }
+        return response.json();
+    })
+    .then(invoice => {
+        if(invoice.error) {
+            document.getElementById("mainContainer").innerHTML = `<div class='error'>❌ ${invoice.error}</div>`;
+            return;
         }
 
-        // بيانات الفاتورة
-        document.getElementById("customer").innerText = invoice.customer;
-        document.getElementById("phone").innerText = invoice.phone;
-        document.getElementById("payment").innerText = invoice.payment;
-        document.getElementById("date").innerText = invoice.date;
-        document.getElementById("total").innerText = invoice.total;
+        // بناء الهيكل الفلات وعرض البيانات المقروءة فوراً للعميل
+        let htmlContent = `
+        <div class="card">
+            <div class="pharmacy">
+                <h3>${invoice.pharmacyName || ''}</h3>
+                ${invoice.pharmacyAddress ? `<p>العنوان: ${invoice.pharmacyAddress}</p>` : ''}
+                ${invoice.pharmacyPhone ? `<p>📞 الهاتف: ${invoice.pharmacyPhone}</p>` : ''}
+                ${invoice.commercialRegister ? `<p>سجل تجاري: ${invoice.commercialRegister}</p>` : ''}
+                ${invoice.taxCard ? `<p>بطاقة ضريبية: ${invoice.taxCard}</p>` : ''}
+                ${invoice.welcomeMessage ? `<p>${invoice.welcomeMessage}</p>` : ''}
+            </div>
 
-        // عرض الأصناف
-        let rows = "";
-        invoice.items.forEach(i=>{
-            rows += `
-            <tr>
-                <td>${i.code}</td>
-                <td>${i.name}</td>
-                <td>${i.qty}</td>
-                <td>${i.price}</td>
-                <td>${i.total}</td>
-            </tr>`;
+            <h2>🧾 تفاصيل الفاتورة رقم #${invoice.invoiceId}</h2>
+
+            <div class="customer-info">
+                <span>👤 العميل: <span>${invoice.customerName || 'عميل نقدي'}</span></span>
+                <span>📞 الهاتف: <span>${invoice.customerPhone || 'غير مسجل'}</span></span>
+            </div>
+
+            <p class="info">💰 طريقة الدفع: ${invoice.paymentMethod || 'كاش'}</p>
+            ${invoice.bankTransactionNo ? `<p class="info" style="color: #673ab7; font-weight: bold;">💳 رقم المعاملة البنكية: ${invoice.bankTransactionNo}</p>` : ''}
+            <p class="info">📅 التاريخ: ${invoice.createdAt || ''}</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>الصنف</th>
+                        <th>الكمية</th>
+                        <th>السعر</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        // إضافة الأصناف ديناميكياً لجدول العرض
+        invoice.items.forEach(i => {
+            htmlContent += `
+                <tr>
+                    <td>${i.code}</td>
+                    <td>${i.name}</td>
+                    <td>${i.qty}</td>
+                    <td>${i.price} ج.م</td>
+                    <td>${i.total} ج.م</td>
+                </tr>`;
         });
-        document.getElementById("items").innerHTML = rows;
 
-    }catch(e){
-        document.body.innerHTML = "<div class='error'>❌ حدث خطأ في قراءة الفاتورة</div>";
-    }
+        htmlContent += `
+                </tbody>
+            </table>
+
+            <div class="total">الإجمالي الكلي: ${invoice.totalAmount}</div>
+            <div class="thanks">${invoice.thanksMessage || 'شكراً لتعاملكم معنا!'}</div>
+        </div>
+        `;
+
+        document.getElementById("mainContainer").innerHTML = htmlContent;
+    })
+    .catch(error => {
+        console.error(error);
+        document.getElementById("mainContainer").innerHTML = "<div class='error'>❌ حدث خطأ أثناء جلب الفاتورة من السيرفر السحابي، تأكد من اتصال الإنترنت.</div>";
+    });
 }
 </script>
 </body>
