@@ -1,222 +1,405 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تفاصيل الفاتورة الإلكترونية</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
-body {
-    font-family: "Tahoma", sans-serif;
-    background: #f7f9fc;
-    padding: 20px;
-    direction: rtl;
-}
+    :root {
+        --brand-dark: #0f172a;      /* Slate Dark */
+        --brand-blue: #2563eb;      /* Tech Blue */
+        --brand-emerald: #059669;   /* Success Emerald */
+        --brand-purple: #7c3aed;    /* Bank Transaction Purple */
+        --bg-light: #f8fafc;
+        --text-main: #334155;
+        --text-muted: #64748b;
+    }
 
-.card {
-    background: #ffffff;
-    padding: 35px 30px;
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    max-width: 950px;
-    margin: auto;
-    border-top: 5px solid #2196F3;
-}
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-h2 {
-    text-align: center;
-    color: #2196F3;
-    margin-bottom: 25px;
-    font-size: 24px;
-}
+    body {
+        font-family: 'Cairo', 'Tajawal', sans-serif;
+        background-color: var(--bg-light);
+        color: var(--text-main);
+        padding: 30px 15px;
+        line-height: 1.6;
+    }
 
-.pharmacy {
-    text-align: center;
-    border-bottom: 2px dashed #ccc;
-    padding-bottom: 18px;
-    margin-bottom: 25px;
-}
+    .card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.02);
+        max-width: 800px;
+        margin: 20px auto;
+        overflow: hidden;
+        border-top: 6px solid var(--brand-blue);
+        position: relative;
+    }
 
-.pharmacy h3 {
-    margin: 5px 0;
-    color: #34495e;
-    font-size: 22px;
-    font-weight: bold;
-}
+    /* هيدر الصيدلية */
+    .pharmacy-header {
+        background: linear-gradient(to bottom, #fdfdfd, #f8fafc);
+        padding: 35px 30px 25px;
+        text-align: center;
+        border-bottom: 2px dashed #e2e8f0;
+    }
 
-.pharmacy p {
-    margin: 4px 0;
-    color: #666;
-    font-size: 15px;
-}
+    .pharmacy-header h3 {
+        color: var(--brand-dark);
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
 
-.info {
-    margin: 8px 0;
-    font-size: 17px;
-    color: #555;
-}
+    .pharmacy-meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
 
-/* تحسين اسم العميل ورقم الهاتف */
-.customer-info {
-    background: #e8f0fe;
-    border-radius: 10px;
-    padding: 12px 15px;
-    margin: 15px 0;
-    display: flex;
-    justify-content: space-between;
-    font-size: 17px;
-    font-weight: bold;
-    color: #1a237e;
-}
+    .pharmacy-meta p {
+        font-size: 14px;
+        color: var(--text-muted);
+        background: #ffffff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+    }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    table-layout: fixed;
-}
+    .welcome-msg {
+        margin-top: 12px;
+        font-size: 14px;
+        color: var(--brand-blue);
+        font-weight: 600;
+    }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-    font-size: 16px;
-    word-wrap: break-word;
-}
+    /* عنوان الفاتورة */
+    .invoice-title {
+        text-align: center;
+        margin: 25px 0 15px;
+        color: var(--brand-blue);
+        font-size: 22px;
+        font-weight: 700;
+    }
 
-th {
-    background: #2196F3;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+    /* بيانات العميل الفلات */
+    .customer-box {
+        background: #eff6ff;
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin: 0 30px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+        border-right: 4px solid var(--brand-blue);
+    }
 
-tbody tr:hover {
-    background-color: #f1f7fc;
-    transition: 0.3s;
-}
+    .customer-box span {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e3a8a;
+    }
 
-.total {
-    font-size: 22px;
-    color: #2ecc71;
-    margin-top: 20px;
-    font-weight: bold;
-    text-align: center;
-}
+    .customer-box i {
+        margin-left: 6px;
+        color: var(--brand-blue);
+    }
 
-.thanks {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 18px;
-    color: #34495e;
-    font-style: italic;
-}
+    /* تفاصيل الفاتورة العامة */
+    .invoice-details {
+        padding: 0 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 25px;
+    }
 
-.loading {
-    text-align: center;
-    font-size: 22px;
-    color: #2196F3;
-    margin-top: 100px;
-    font-weight: bold;
-}
+    .detail-item {
+        font-size: 14px;
+        color: var(--text-main);
+        background: #f1f5f9;
+        padding: 10px 15px;
+        border-radius: 8px;
+    }
 
-.error {
-    text-align: center;
-    color: red;
-    font-size: 20px;
-    margin-top: 50px;
-}
+    .detail-item i {
+        margin-left: 8px;
+        color: var(--text-muted);
+        width: 16px;
+        text-align: center;
+    }
+
+    .detail-item.bank-highlight {
+        background: #f5f3ff;
+        color: var(--brand-purple);
+        font-weight: bold;
+        border: 1px solid #ddd6fe;
+    }
+    .detail-item.bank-highlight i {
+        color: var(--brand-purple);
+    }
+
+    /* تحسين الجدول المتجاوب */
+    .table-container {
+        padding: 0 30px;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        background: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th, td {
+        padding: 14px 12px;
+        text-align: center;
+        font-size: 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        background: var(--brand-dark);
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    /* الحاوية السفلية للإجمالي والشكر */
+    .invoice-footer {
+        background: #f8fafc;
+        padding: 25px 30px;
+        margin-top: 30px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .total-box {
+        background: var(--brand-emerald);
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: 700;
+        padding: 10px 30px;
+        border-radius: 50px;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .thanks-box {
+        font-size: 15px;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-align: center;
+    }
+
+    /* شاشة التحميل الذكية */
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 150px;
+        gap: 15px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #e2e8f0;
+        border-top: 5px solid var(--brand-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+        font-size: 18px;
+        color: var(--brand-blue);
+        font-weight: 600;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* رسائل الخطأ */
+    .error-card {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #991b1b;
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 500px;
+        margin: 100px auto;
+        text-align: center;
+        font-weight: 700;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+    /* تحسينات الشاشات الصغيرة للموبايل */
+    @media (max-width: 600px) {
+        .customer-box {
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 0 15px 15px;
+            padding: 12px 15px;
+        }
+        .invoice-details, .table-container {
+            padding: 0 15px;
+        }
+        .pharmacy-header {
+            padding: 25px 15px 20px;
+        }
+        th, td {
+            padding: 10px 8px;
+            font-size: 13px;
+        }
+        .total-box {
+            font-size: 17px;
+            padding: 8px 20px;
+        }
+    }
 </style>
 </head>
 
 <body>
+
 <div id="mainContainer">
-    <div class="loading" id="loader">⏳ جاري تحميل بيانات الفاتورة السحابية من السيرفر...</div>
+    <div class="loading-container" id="loader">
+        <div class="spinner"></div>
+        <div class="loading-text">جاري مزامنة بيانات الفاتورة السحابية الآمنة...</div>
+    </div>
 </div>
 
 <script>
-// دالة لجلب البارامترات من الرابط
 function getParam(name){
     let url = new URL(window.location.href);
     return url.searchParams.get(name);
 }
 
-// رابط السيرفر السحابي الحالي (نفس الرابط المستضيف لبيانات جوجل شيت)
 const apiBaseUrl = "https://script.google.com/macros/s/AKfycbx4ezTTarc4aVuQ1VR6dxQTMRGgJaaJ1OPGPxCiRGMYzPB3MKikKA7HuJ_vjzxkOu6h3Q/exec";
-
 let invoiceId = getParam("invoiceId");
 
 if(!invoiceId){
-    document.getElementById("mainContainer").innerHTML = "<div class='error'>❌ خطأ: لم يتم تحديد رقم فاتورة صحيح في الرابط.</div>";
+    document.getElementById("mainContainer").innerHTML = `
+        <div class="error-card">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 30px; margin-bottom: 10px; color: #dc2626;"></i>
+            <div>خطأ نظامي: لم يتم إرفاق رقم الفاتورة الإلكترونية بشكل صحيح في الرابط.</div>
+        </div>`;
 } else {
-    // الاتصال بالسيرفر الحالي لجلب الفاتورة المطلوبة بناءً على الـ ID
     fetch(`${apiBaseUrl}?invoiceId=${invoiceId}`)
     .then(response => {
-        if (!response.ok) {
-            throw new Error("فشل الاتصال بالخادم السحابي");
-        }
+        if (!response.ok) throw new Error("فشل الاتصال بالخادم السحابي");
         return response.json();
     })
     .then(invoice => {
         if(invoice.error) {
-            document.getElementById("mainContainer").innerHTML = `<div class='error'>❌ ${invoice.error}</div>`;
+            document.getElementById("mainContainer").innerHTML = `
+                <div class="error-card">
+                    <i class="fa-solid fa-circle-xmark" style="font-size: 30px; margin-bottom: 10px; color: #dc2626;"></i>
+                    <div>${invoice.error}</div>
+                </div>`;
             return;
         }
 
-        // بناء الهيكل الفلات وعرض البيانات المقروءة فوراً للعميل
+        // بناء الواجهة الفلات الاحترافية المتكاملة والمقاومة للموبايل
         let htmlContent = `
         <div class="card">
-            <div class="pharmacy">
-                <h3>${invoice.pharmacyName || ''}</h3>
-                ${invoice.pharmacyAddress ? `<p>العنوان: ${invoice.pharmacyAddress}</p>` : ''}
-                ${invoice.pharmacyPhone ? `<p>📞 الهاتف: ${invoice.pharmacyPhone}</p>` : ''}
-                ${invoice.commercialRegister ? `<p>سجل تجاري: ${invoice.commercialRegister}</p>` : ''}
-                ${invoice.taxCard ? `<p>بطاقة ضريبية: ${invoice.taxCard}</p>` : ''}
-                ${invoice.welcomeMessage ? `<p>${invoice.welcomeMessage}</p>` : ''}
+            <div class="pharmacy-header">
+                <h3>${invoice.pharmacyName || 'المؤسسة الطبية البيطرية'}</h3>
+                <div class="pharmacy-meta">
+                    ${invoice.pharmacyAddress ? `<p><i class="fa-solid fa-location-dot"></i> ${invoice.pharmacyAddress}</p>` : ''}
+                    ${invoice.pharmacyPhone ? `<p><i class="fa-solid fa-phone"></i> ${invoice.pharmacyPhone}</p>` : ''}
+                    ${invoice.commercialRegister ? `<p>سجل: ${invoice.commercialRegister}</p>` : ''}
+                    ${invoice.taxCard ? `<p>بطاقة ضريبية: ${invoice.taxCard}</p>` : ''}
+                </div>
+                ${invoice.welcomeMessage ? `<div class="welcome-msg">${invoice.welcomeMessage}</div>` : ''}
             </div>
 
-            <h2>🧾 تفاصيل الفاتورة رقم #${invoice.invoiceId}</h2>
+            <h2 class="invoice-title"><i class="fa-solid fa-file-invoice-dollar"></i> تفاصيل الفاتورة الإلكترونية #${invoice.invoiceId}</h2>
 
-            <div class="customer-info">
-                <span>👤 العميل: <span>${invoice.customerName || 'عميل نقدي'}</span></span>
-                <span>📞 الهاتف: <span>${invoice.customerPhone || 'غير مسجل'}</span></span>
+            <div class="customer-box">
+                <span><i class="fa-solid fa-user"></i> العميل: ${invoice.customerName || 'عميل نقدي'}</span>
+                <span><i class="fa-solid fa-mobile-screen-button"></i> الهاتف: ${invoice.customerPhone || 'غير مسجل'}</span>
             </div>
 
-            <p class="info">💰 طريقة الدفع: ${invoice.paymentMethod || 'كاش'}</p>
-            ${invoice.bankTransactionNo ? `<p class="info" style="color: #673ab7; font-weight: bold;">💳 رقم المعاملة البنكية: ${invoice.bankTransactionNo}</p>` : ''}
-            <p class="info">📅 التاريخ: ${invoice.createdAt || ''}</p>
+            <div class="invoice-details">
+                <div class="detail-item"><i class="fa-solid fa-wallet"></i> طريقة الدفع: <b>${invoice.paymentMethod || 'كاش'}</b></div>
+                <div class="detail-item"><i class="fa-solid fa-calendar-days"></i> التاريخ والوقت: <b>${invoice.createdAt || ''}</b></div>
+                ${invoice.bankTransactionNo ? `
+                <div class="detail-item bank-highlight"><i class="fa-solid fa-credit-card"></i> رقم الحركة البنكية: ${invoice.bankTransactionNo}</div>` : ''}
+            </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>الكود</th>
-                        <th>الصنف</th>
-                        <th>الكمية</th>
-                        <th>السعر</th>
-                        <th>الإجمالي</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">الكود</th>
+                            <th style="text-align: right; width: 45%;">الصنف الدوائي</th>
+                            <th style="width: 10%;">الكمية</th>
+                            <th style="width: 15%;">السعر</th>
+                            <th style="width: 15%;">الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
 
-        // إضافة الأصناف ديناميكياً لجدول العرض
+        // إدراج الأصناف برمجياً داخل جسم الجدول
         invoice.items.forEach(i => {
             htmlContent += `
                 <tr>
-                    <td>${i.code}</td>
-                    <td>${i.name}</td>
-                    <td>${i.qty}</td>
-                    <td>${i.price} ج.م</td>
-                    <td>${i.total} ج.م</td>
+                    <td style="color: var(--text-muted); font-size: 13px;">${i.code}</td>
+                    <td style="text-align: right; font-weight: 600; color: var(--brand-dark);">${i.name}</td>
+                    <td><span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${i.qty}</span></td>
+                    <td>${parseFloat(i.price).toFixed(2)} ج.م</td>
+                    <td style="font-weight: 700; color: var(--brand-dark);">${parseFloat(i.total).toFixed(2)} ج.م</td>
                 </tr>`;
         });
 
         htmlContent += `
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
 
-            <div class="total">الإجمالي الكلي: ${invoice.totalAmount}</div>
-            <div class="thanks">${invoice.thanksMessage || 'شكراً لتعاملكم معنا!'}</div>
+            <div class="invoice-footer">
+                <div class="total-box">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <span>الإجمالي المستحق: ${parseFloat(invoice.totalAmount).toFixed(2)} ج.م</span>
+                </div>
+                <div class="thanks-box">
+                    <i class="fa-solid fa-heart" style="color: #e11d48; margin-left: 4px;"></i>
+                    ${invoice.thanksMessage || 'شكراً لثقتكم في خدماتنا الطبية!'}
+                </div>
+            </div>
         </div>
         `;
 
@@ -224,7 +407,11 @@ if(!invoiceId){
     })
     .catch(error => {
         console.error(error);
-        document.getElementById("mainContainer").innerHTML = "<div class='error'>❌ حدث خطأ أثناء جلب الفاتورة من السيرفر السحابي، تأكد من اتصال الإنترنت.</div>";
+        document.getElementById("mainContainer").innerHTML = `
+            <div class="error-card">
+                <i class="fa-solid fa-wifi" style="font-size: 30px; margin-bottom: 10px; color: #dc2626;"></i>
+                <div>فشل جلب البيانات السحابية، يرجى التحقق من اتصال الهاتف بالشبكة والمحاولة مجدداً.</div>
+            </div>`;
     });
 }
 </script>
