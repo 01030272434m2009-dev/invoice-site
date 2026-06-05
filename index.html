@@ -22,6 +22,7 @@
     }
 
     * {
+        box-shadow: none;
         box-sizing: border-box;
         margin: 0;
         padding: 0;
@@ -306,7 +307,8 @@ function getParam(name){
     return url.searchParams.get(name);
 }
 
-const apiBaseUrl = "https://script.google.com/macros/s/AKfycbx4ezTTarc4aVuQ1VR6dxQTMRGgJaaJ1OPGPxCiRGMYzPB3MKikKA7HuJ_vjzxkOu6h3Q/exec";
+// 🌐 ربط الواجهة مباشرة برابط خادم الـ Apps Script الجديد والمعدل
+const apiBaseUrl = "https://script.google.com/macros/s/AKfycbVUWUppeCCXriJNSUOWfQUaMCFyLUiZ0K7DsAoCpgM1vQHTsgiDGydbEXWgJwywRAw/exec";
 let invoiceId = getParam("invoiceId");
 
 if(!invoiceId){
