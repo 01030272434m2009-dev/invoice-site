@@ -50,8 +50,8 @@
         }
     }
 
-    /* كارت الفاتورة الرئيسي */
-    .card {
+    /* كارت الفاتورة الرئيسي والبحث */
+    .card, .search-card {
         background: #ffffff;
         border-radius: 24px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.035), 0 10px 20px -10px rgba(0, 0, 0, 0.02);
@@ -64,7 +64,7 @@
     }
 
     /* الشريط العلوي الجمالي */
-    .card::before {
+    .card::before, .search-card::before {
         content: '';
         position: absolute;
         top: 0;
@@ -350,6 +350,88 @@
         box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
         transform: translateY(-1px);
     }
+    
+    .btn-secondary {
+        background: #64748b;
+        box-shadow: 0 4px 6px -1px rgba(100, 116, 139, 0.2);
+    }
+    .btn-secondary:hover {
+        background: #334155;
+    }
+
+    /* ستايل فورم البحث الشيك الجديد */
+    .search-card {
+        max-width: 550px;
+        padding: 40px 30px;
+        text-align: center;
+    }
+    
+    .search-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        background: #eff6ff;
+        color: var(--brand-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin: 0 auto 20px;
+        border: 1px dashed rgba(59, 130, 246, 0.4);
+    }
+
+    .search-card h2 {
+        font-size: 22px;
+        color: var(--brand-dark);
+        margin-bottom: 10px;
+        font-weight: 800;
+    }
+
+    .search-card p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: right;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--brand-dark);
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        font-family: 'Cairo', sans-serif;
+        padding: 14px 16px;
+        font-size: 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        background-color: #f8fafc;
+        color: var(--brand-dark);
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--brand-blue);
+        background-color: #ffffff;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-search {
+        width: 100%;
+        justify-content: center;
+        padding: 14px;
+        margin-top: 10px;
+    }
 
     /* شاشة التحميل المتطورة */
     .loading-container {
@@ -389,7 +471,7 @@
         padding: 35px;
         border-radius: 24px;
         max-width: 480px;
-        margin: 60px auto;
+        margin: 30px auto;
         text-align: center;
         font-weight: 700;
         box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
@@ -401,7 +483,7 @@
         body {
             padding: 15px 10px;
         }
-        .card {
+        .card, .search-card {
             border-radius: 20px;
         }
         .pharmacy-header {
@@ -479,7 +561,7 @@
     @media print {
         body { background: #ffffff; padding: 0; }
         .card { box-shadow: none; border: none; }
-        .card::before, .actions-container { display: none; }
+        .card::before, .actions-container, .search-card { display: none; }
     }
 </style>
 </head>
@@ -494,130 +576,219 @@
 </div>
 
 <script>
+const apiBaseUrl = "https://script.google.com/macros/s/AKfycbzVUWUppeCCXriJNSUOWfQUaMCFyLUiZ0K7DsAoCpgM1vQHTsgiDGydbEXWgJwywRAw/exec";
+
 function getParam(name){
     let url = new URL(window.location.href);
     return url.searchParams.get(name);
 }
 
-const apiBaseUrl = "https://script.google.com/macros/s/AKfycbzVUWUppeCCXriJNSUOWfQUaMCFyLUiZ0K7DsAoCpgM1vQHTsgiDGydbEXWgJwywRAw/exec";
-let invoiceId = getParam("invoiceId");
+// دالة لتغيير حقل المدخلات بناءً على معيار البحث المختار
+function updatePlaceholder() {
+    const searchType = document.getElementById("searchType").value;
+    const searchInput = document.getElementById("searchInput");
+    if (searchType === "invoiceId") {
+        searchInput.placeholder = "مثال: 1024";
+        searchInput.type = "text";
+    } else if (searchType === "phone") {
+        searchInput.placeholder = "مثال: 01xxxxxxxxx";
+        searchInput.type = "tel";
+    } else if (searchType === "name") {
+        searchInput.placeholder = "اكتب اسم العميل ثلاثي...";
+        searchInput.type = "text";
+    }
+}
 
-if(!invoiceId){
+// عرض واجهة البحث الأنيقة
+function showSearchForm() {
     document.getElementById("mainContainer").innerHTML = `
-        <div class="error-card">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size: 44px; margin-bottom: 15px; color: #dc2626;"></i>
-            <div>خطأ في النظام: لم يتم العثور على رقم الفاتورة في الرابط بشكل صحيح.</div>
+        <div class="search-card">
+            <div class="search-icon-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h2>البحث عن فاتورة إلكترونية</h2>
+            <p>الرابط غير مكتمل أو منتهي، يمكنك البحث عن فاتورتك وتصفحها مباشرة من هنا.</p>
+            
+            <div id="searchErrorLocation"></div>
+
+            <form id="invoiceSearchForm" onsubmit="handleSearch(event)">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-filter" style="color: var(--brand-blue); margin-left: 5px;"></i> ابحث باستخدام:</label>
+                    <select id="searchType" class="form-select" onchange="updatePlaceholder()">
+                        <option value="invoiceId">رقم الفاتورة</option>
+                        <option value="phone">رقم هاتف العميل</option>
+                        <option value="name">اسم العميل</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fa-solid fa-keyboard" style="color: var(--brand-blue); margin-left: 5px;"></i> أدخل بيانات البحث:</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="مثال: 1024" required>
+                </div>
+
+                <button type="submit" class="btn btn-search">
+                    <i class="fa-solid fa-circle-check"></i> عرض الفاتورة الآن
+                </button>
+            </form>
+        </div>
+    `;
+}
+
+// معالجة عملية البحث من الفورم
+function handleSearch(event) {
+    event.preventDefault();
+    const searchType = document.getElementById("searchType").value;
+    const queryValue = document.getElementById("searchInput").value.trim();
+    
+    let apiUrl = `${apiBaseUrl}?${searchType}=${encodeURIComponent(queryValue)}`;
+    fetchInvoiceData(apiUrl, true);
+}
+
+// جلب البيانات من السيرفر
+function fetchInvoiceData(url, isFromForm = false) {
+    // إظهار اللودر
+    document.getElementById("mainContainer").innerHTML = `
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <div class="loading-text">جاري البحث ومزامنة البيانات السحابية...</div>
         </div>`;
-} else {
-    fetch(`${apiBaseUrl}?invoiceId=${invoiceId}`)
+
+    fetch(url)
     .then(response => {
         if (!response.ok) throw new Error("فشل الاتصال بالخادم السحابي");
         return response.json();
     })
     .then(invoice => {
         if(invoice.error) {
-            document.getElementById("mainContainer").innerHTML = `
-                <div class="error-card">
-                    <i class="fa-solid fa-circle-xmark" style="font-size: 44px; margin-bottom: 15px; color: #dc2626;"></i>
-                    <div>${invoice.error}</div>
-                </div>`;
+            renderError(invoice.error, isFromForm);
             return;
         }
-
-        // بناء واجهة الفاتورة الفاخرة الجديدة المحدثة
-        let htmlContent = `
-        <div class="card">
-            <div class="pharmacy-header">
-                <h3>${invoice.pharmacyName || 'المؤسسة الطبية البيطرية'}</h3>
-                <div class="pharmacy-meta">
-                    ${invoice.pharmacyAddress ? `<p><i class="fa-solid fa-location-dot"></i> ${invoice.pharmacyAddress}</p>` : ''}
-                    ${invoice.pharmacyPhone ? `<p><i class="fa-solid fa-phone"></i> ${invoice.pharmacyPhone}</p>` : ''}
-                    ${invoice.commercialRegister ? `<p>سجل تجاري: ${invoice.commercialRegister}</p>` : ''}
-                    ${invoice.taxCard ? `<p>بطاقة ضريبية: ${invoice.taxCard}</p>` : ''}
-                </div>
-                ${invoice.welcomeMessage ? `<div class="welcome-msg">${invoice.welcomeMessage}</div>` : ''}
-            </div>
-
-            <h2 class="invoice-title"><i class="fa-solid fa-file-invoice-dollar"></i> فاتورة إلكترونية رقم #${invoice.invoiceId}</h2>
-
-            <div class="customer-box">
-                <span><i class="fa-solid fa-user"></i> العميل: ${invoice.customerName || 'عميل نقدي'}</span>
-                <span><i class="fa-solid fa-mobile-screen-button"></i> الهاتف: ${invoice.customerPhone || 'غير مسجل'}</span>
-            </div>
-
-            <div class="invoice-details">
-                <div class="detail-item">
-                    <span class="label"><i class="fa-solid fa-wallet"></i> طريقة الدفع</span>
-                    <b>${invoice.paymentMethod || 'كاش'}</b>
-                </div>
-                <div class="detail-item">
-                    <span class="label"><i class="fa-solid fa-calendar-days"></i> التاريخ والوقت</span>
-                    <b>${invoice.createdAt || ''}</b>
-                </div>
-                ${invoice.bankTransactionNo ? `
-                <div class="detail-item bank-highlight">
-                    <span class="label"><i class="fa-solid fa-credit-card"></i> الحركة البنكية</span>
-                    <b>${invoice.bankTransactionNo}</b>
-                </div>` : ''}
-            </div>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 15%; text-align: center;">الكود</th>
-                            <th style="text-align: right; width: 45%;">الصنف</th>
-                            <th style="width: 10%; text-align: center;">الكمية</th>
-                            <th style="width: 15%; text-align: center;">السعر</th>
-                            <th style="width: 15%; text-align: center;">الإجمالي</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        invoice.items.forEach(i => {
-            htmlContent += `
-                <tr>
-                    <td data-label="الكود" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight:600;">${i.code}</td>
-                    <td data-label="الصنف" style="text-align: right; font-weight: 700; color: var(--brand-dark);">${i.name}</td>
-                    <td data-label="الكمية" style="text-align: center;"><span style="background: #e2e8f0; padding: 3px 12px; border-radius: 8px; font-weight: 700; color: var(--brand-dark); font-size: 13px;">${i.qty}</span></td>
-                    <td data-label="السعر" style="text-align: center; font-weight: 600;">${parseFloat(i.price).toFixed(2)} ج.م</td>
-                    <td data-label="الإجمالي" style="text-align: center; font-weight: 800; color: var(--brand-dark);">${parseFloat(i.total).toFixed(2)} ج.م</td>
-                </tr>`;
-        });
-
-        htmlContent += `
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="invoice-footer">
-                <div class="total-box">
-                    <span><i class="fa-solid fa-money-bill-wave"></i> إجمالي المبلغ المستحق:</span>
-                    <span class="amount">${parseFloat(invoice.totalAmount).toFixed(2)} ج.م</span>
-                </div>
-                <div class="thanks-box">
-                    <i class="fa-solid fa-circle-check" style="color: var(--brand-emerald); font-size: 18px;"></i>
-                    <span>${invoice.thanksMessage || 'شكراً لثقتكم في خدماتنا!'}</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="actions-container">
-            <button class="btn" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة أو حفظ الفاتورة</button>
-        </div>
-        `;
-
-        document.getElementById("mainContainer").innerHTML = htmlContent;
+        renderInvoice(invoice);
     })
     .catch(error => {
         console.error(error);
-        document.getElementById("mainContainer").innerHTML = `
-            <div class="error-card">
-                <i class="fa-solid fa-wifi" style="font-size: 44px; margin-bottom: 15px; color: #dc2626;"></i>
-                <div>حدث خطأ أثناء جلب البيانات، يرجى التحقق من اتصال الإنترنت وإعادة المحاولة.</div>
-            </div>`;
+        renderError("حدث خطأ أثناء جلب البيانات، يرجى التحقق من اتصال الإنترنت والمحاولة مجدداً.", isFromForm);
     });
+}
+
+// بناء وعرض الفاتورة الفاخرة
+function renderInvoice(invoice) {
+    let htmlContent = `
+    <div class="card">
+        <div class="pharmacy-header">
+            <h3>${invoice.pharmacyName || 'المؤسسة الطبية البيطرية'}</h3>
+            <div class="pharmacy-meta">
+                ${invoice.pharmacyAddress ? `<p><i class="fa-solid fa-location-dot"></i> ${invoice.pharmacyAddress}</p>` : ''}
+                ${invoice.pharmacyPhone ? `<p><i class="fa-solid fa-phone"></i> ${invoice.pharmacyPhone}</p>` : ''}
+                ${invoice.commercialRegister ? `<p>سجل تجاري: ${invoice.commercialRegister}</p>` : ''}
+                ${invoice.taxCard ? `<p>بطاقة ضريبية: ${invoice.taxCard}</p>` : ''}
+            </div>
+            ${invoice.welcomeMessage ? `<div class="welcome-msg">${invoice.welcomeMessage}</div>` : ''}
+        </div>
+
+        <h2 class="invoice-title"><i class="fa-solid fa-file-invoice-dollar"></i> فاتورة إلكترونية رقم #${invoice.invoiceId}</h2>
+
+        <div class="customer-box">
+            <span><i class="fa-solid fa-user"></i> العميل: ${invoice.customerName || 'عميل نقدي'}</span>
+            <span><i class="fa-solid fa-mobile-screen-button"></i> الهاتف: ${invoice.customerPhone || 'غير مسجل'}</span>
+        </div>
+
+        <div class="invoice-details">
+            <div class="detail-item">
+                <span class="label"><i class="fa-solid fa-wallet"></i> طريقة الدفع</span>
+                <b>${invoice.paymentMethod || 'كاش'}</b>
+            </div>
+            <div class="detail-item">
+                <span class="label"><i class="fa-solid fa-calendar-days"></i> التاريخ والوقت</span>
+                <b>${invoice.createdAt || ''}</b>
+            </div>
+            ${invoice.bankTransactionNo ? `
+            <div class="detail-item bank-highlight">
+                <span class="label"><i class="fa-solid fa-credit-card"></i> الحركة البنكية</span>
+                <b>${invoice.bankTransactionNo}</b>
+            </div>` : ''}
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%; text-align: center;">الكود</th>
+                        <th style="text-align: right; width: 45%;">الصنف</th>
+                        <th style="width: 10%; text-align: center;">الكمية</th>
+                        <th style="width: 15%; text-align: center;">السعر</th>
+                        <th style="width: 15%; text-align: center;">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    invoice.items.forEach(i => {
+        htmlContent += `
+            <tr>
+                <td data-label="الكود" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight:600;">${i.code}</td>
+                <td data-label="الصنف" style="text-align: right; font-weight: 700; color: var(--brand-dark);">${i.name}</td>
+                <td data-label="الكمية" style="text-align: center;"><span style="background: #e2e8f0; padding: 3px 12px; border-radius: 8px; font-weight: 700; color: var(--brand-dark); font-size: 13px;">${i.qty}</span></td>
+                <td data-label="السعر" style="text-align: center; font-weight: 600;">${parseFloat(i.price).toFixed(2)} ج.م</td>
+                <td data-label="الإجمالي" style="text-align: center; font-weight: 800; color: var(--brand-dark);">${parseFloat(i.total).toFixed(2)} ج.م</td>
+            </tr>`;
+    });
+
+    htmlContent += `
+                </tbody>
+            </table>
+        </div>
+
+        <div class="invoice-footer">
+            <div class="total-box">
+                <span><i class="fa-solid fa-money-bill-wave"></i> إجمالي المبلغ المستحق:</span>
+                <span class="amount">${parseFloat(invoice.totalAmount).toFixed(2)} ج.م</span>
+            </div>
+            <div class="thanks-box">
+                <i class="fa-solid fa-circle-check" style="color: var(--brand-emerald); font-size: 18px;"></i>
+                <span>${invoice.thanksMessage || 'شكراً لثقتكم في خدماتنا!'}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="actions-container">
+        <button class="btn btn-secondary" onclick="showSearchForm()"><i class="fa-solid fa-arrow-right"></i> بحث جديد</button>
+        <button class="btn" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة أو حفظ الفاتورة</button>
+    </div>
+    `;
+
+    document.getElementById("mainContainer").innerHTML = htmlContent;
+}
+
+// دالة عرض كروت الخطأ
+function renderError(message, isFromForm) {
+    if(isFromForm) {
+        // إذا كان جاي من الفورم، رجّع الفورم وحط فوقه رسالة الخطأ بدون تدمير الصفحة
+        showSearchForm();
+        document.getElementById("searchErrorLocation").innerHTML = `
+            <div class="error-card" style="margin: 0 0 20px 0; padding: 15px; border-radius:14px; font-size:14px;">
+                <i class="fa-solid fa-circle-xmark" style="font-size: 20px; margin-bottom: 5px; color: #dc2626;"></i>
+                <div>${message}</div>
+            </div>`;
+    } else {
+        // إذا كان خطأ في الرابط الأساسي، افتح الفورم مباشرة بدلاً من عرض صفحة خطأ ميتة
+        showSearchForm();
+        document.getElementById("searchErrorLocation").innerHTML = `
+            <div class="error-card" style="margin: 0 0 20px 0; padding: 15px; border-radius:14px; font-size:14px;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 20px; margin-bottom: 5px; color: #b45309;"></i>
+                <div>رابط مباشر غير صحيح. يمكنك البحث يدوياً بالأسفل:</div>
+            </div>`;
+    }
+}
+
+// بداية التشغيل وفحص المعاملات بالرابط
+let invoiceId = getParam("invoiceId");
+if(!invoiceId){
+    // المظهر الثاني: الرابط ناقص، يفتح فوراً شاشة البحث
+    showSearchForm();
+} else {
+    // المظهر الأول والطبيعي: جلب بيانات الفاتورة بالرابط مباشرة
+    fetchInvoiceData(`${apiBaseUrl}?invoiceId=${invoiceId}`, false);
 }
 </script>
 </body>
